@@ -1,0 +1,178 @@
+﻿@model DoTask.VievModels.UserUpdateViewModel
+    @Html.HiddenFor(model=>model.Id)
+@{
+    var listOfRoles = new Dictionary<string, string>
+{
+            { "Admin", "Admin" },
+            { "ProjectManager", "Project Manager" },
+            {"Developer", "Developer" }
+        };
+    var selectedItemDescription = listOfRoles[Model.UserRole];
+    listOfRoles.Remove(Model.UserRole);
+    var option1Key = listOfRoles.Keys.ElementAt(0);
+    var option2Key = listOfRoles.Keys.ElementAt(1);
+    var optionDescription1 = listOfRoles.Values.ElementAt(0);
+    var optionDescription2 = listOfRoles.Values.ElementAt(1);
+    var nesto = Model.ConfirmPassword;
+    var nesto1 = Model.PasswordHash;
+
+}
+<head>
+    <link href="~/Content/CreatEdit.css" rel="stylesheet" />
+</head>
+
+@using (Html.BeginForm("Update", "Users", FormMethod.Post, new
+{
+    enctype = "multipart/form-data",
+    id = "fileForm"
+}))
+{
+    @Html.AntiForgeryToken()
+    
+
+    <div class="container-fluid">
+        <br />
+        <div class="imageWrapper" style="position: relative;">
+            @if (Model.Photo == null)
+            {
+                <img id="picture" class="avatar img-circle img-thumbnail" src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" style="max-height:50px; margin-left:45px; max-width:100px;" alt="">
+            }
+            else
+            {
+                <img id="picture" class="avatar  img-circle img-thumbnail" src=@("data:" + Model.PhotoType + ";base64," + Convert.ToBase64String(Model.Photo)) style="max-height:100px;  margin-left:10px; max-width:100px;" alt="" />
+
+            }
+            <i id="addIcon" class="fa fa-upload" data-toggle="tooltip" data-placement="right" title="You can add photo by clicking here"></i>
+            <input id="inputID" type="file" name="image" size="40" accept="image/*"
+                   style="display:none;"
+                   onchange="readURL(this);" />
+            <span class="label label-info" id="upload-file-info"></span>
+
+            <ul class="list-unstyled" style="padding-left:2em;" id="toImage">
+                <li><i class="glyphicon glyphicon-user"></i> Full Name: <span id="targetFirstName"> </span> <span id="targetLastName"></span> </li>
+            </ul>
+            <div class="fade_rule"></div>
+            <div class="col-sm-9" style="margin-top:10px">
+                <ul class="nav nav-tabs" id="listTabs">
+                    <li class="active"><a class="tabText" data-toggle="tab" href="#personal-details">Personal Details</a></li>
+                    <li><a class="tabText" data-toggle="tab" href="#organizational">Organizational</a></li>
+                    <li><a class="tabText" data-toggle="tab" id="systemTab" href="#system">System</a></li>
+
+                </ul>
+            </div>
+            <br />
+            <div class="tab-content">
+                <div class="tab-pane active" id="personal-details">
+                    <div class="form-group">
+                        <div class="col-xs-6">
+                            <label for="FirstName"><span class="h4">First name</span></label>
+                            @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control", @placeholder = "enter first name", @id = "firstName" } })
+                            @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6">
+                            <label for="LastName"><span class="h4">Last name</span></label>
+                            @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", @placeholder = "enter last name", @id = "lastName" } })
+                            @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane" id="organizational">
+                    <div class="col-xs-6">
+                        <label for="UserRole"><span class="h4">User role</span></label>
+                        <select class="form-control" id="userRole" name="UserRole">
+                            <option value="@Model.UserRole" selected="selected">@selectedItemDescription</option>
+                            <option value="@option1Key">@optionDescription1</option>
+                            <option value="@option2Key">@optionDescription2</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6">
+                            <h4>Is active</h4>
+                            <label class="switch" style="margin:0px;">
+                                <input id="isActive" name="IsActive" type="checkbox" value="true" class="switch-input" checked>
+                                <span class="switch-label" data-on="" data-off=""></span>
+                                <span class="switch-handle"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="system">
+                    <div class="form-group">
+                        <div class="col-xs-6">
+                            <label for="User.UserName"><span class="h4">Username</span></label>
+                            @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control", @placeholder = "enter username" } })
+                            @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-xs-6">
+                            <label for="Email"><span class="h4">Email</span></label>
+                            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", @placeholder = "enter e-mail" } })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6">
+                            <label for="PasswordHash"><span class="h4">Password</span></label>
+                            <input class="form-control text-box single-line" id="passwordHash" name="PasswordHash" placeholder="enter password" type="password" value="@Model.PasswordHash">
+                            @Html.ValidationMessageFor(model => model.PasswordHash, "", new { @class = "text-danger" })
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6">
+                            <label for="ConfirmPassword"><span class="h4">Confirm Password</span></label>
+                            <input class="form-control text-box single-line" id="confirmPassword" name="ConfirmPassword" placeholder="confirm password" type="password" value="@Model.ConfirmPassword">
+                            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <br>
+                    <input id="generate" class="btn btn-lg btn-info pull-right" type="submit">
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+@section Scripts {
+    <script>
+        var inputFirstName = document.getElementById('firstName');
+        var inputLastName = document.getElementById('lastName');
+        inputFirstName.onkeyup = function () {
+            document.getElementById('targetFirstName').innerHTML = inputFirstName.value;
+        }
+        inputLastName.onkeyup = function () {
+            document.getElementById('targetLastName').innerHTML = inputLastName.value;
+        }
+
+        $("#addIcon").click(function () {
+            $("#inputID").click();
+        });
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#picture').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        $("#fileForm").attr("autocomplete", "off");
+    </script>
+
+
+    @Scripts.Render("~/bundles/jqueryval")
+}

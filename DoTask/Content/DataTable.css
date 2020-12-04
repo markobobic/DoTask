@@ -1,0 +1,27 @@
+﻿@media screen and (max-width: 767px) {
+    div .dataTables_length, div.dataTables_filter, div.dataTables_info, div.dataTables_paginate {
+        text-align: center;
+    }
+}
+
+table.dataTable thead > tr > th {
+    background: #2E0077 !important;
+    color: #fff;
+    padding: 10px 5px;
+}
+
+.btn-info {
+    background-color: #2E0077;
+}
+
+.form-control {
+    width: 90% !important;
+}
+.child {
+    height: 2%;
+    width: 2%;
+    align-self: flex-start;
+}
+.parent {
+    display: flex;
+}

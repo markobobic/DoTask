@@ -1,0 +1,106 @@
+﻿@using DoTask.VievModels
+@model IndexProfileViewModel
+
+<head>
+    <link href="~/Content/Pictures/Dasboard.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Sidenavbar.css" rel="stylesheet" />
+    <link href="~/Content/ScrollBar.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+</head>
+
+<aside class="side-nav" id="show-side-navigation">
+    <div class="heading cent text-center">
+        @if (Model.Photo == null)
+        {
+            <img id="dashboardPic" class="avatar img-circle img-thumbnailc align-content-center" src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" alt="">
+
+        }
+        else
+        {
+            <a href="@Url.Action("Index", "Home")">
+                <img id="dashboardPic" class=" avatar  img-circle img-thumbnail justify-content-md-center" src=@("data:" + Model.PhotoType + ";base64," + Convert.ToBase64String(Model.Photo)) alt="" />
+            </a>
+        }
+        <div class=" text-center">
+            <h3><a id="fullName" href="@Url.Action("Index", "Home")">@Model.FirstName @Model.LastName</a></h3>
+            <p id="position">@Model.Position</p>
+        </div>
+    </div>
+    <ul class="categories text-center" style="margin-left:-5%">
+        @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
+        {
+            <li>
+                <i class="fas fa-user" aria-hidden="true"></i><a href="/Users/Index">Users</a>
+            </li>
+            <li>
+                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/Index">Tasks</a>
+            </li>
+            <li>
+                <i class="fas fa-project-diagram" aria-hidden="true"></i><a href="/Projects/Index">Projects</a>
+            </li>
+        }
+        @if (User.IsInRole("Developer"))
+        {
+            <li>
+                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/Index">Tasks</a>
+            </li>
+        }
+    </ul>
+</aside>
+<nav class="navbar-fixed-top navbar-expand-sm" id="navbarl">
+    <div class="container-fluid">
+        <div class="navbar-header">
+
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <i class="fa fa-align-left"></i>
+            </button>
+            <a class="navbar-brand" href="/Home/Index">
+                <img id="logo" style="max-height:67px;  max-width:200px;" alt="" src="~/Content/Pictures/logoPurple.png" />
+            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown" style="color:aqua">
+                    <a href="#" class="dropdown-toggle" id="dropdownFullName" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color:white"><i style="font-size:15pt" ; class="fas fa-sign-out-alt"></i></a>
+                    <ul class="dropdown-menu ">
+
+                        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            @:<li class="text-center"> <a style="color:white;" class="nav-link" href="javascript:document.getElementById('logoutForm').submit()" <i class="fa fa-sign-out"></i>Log out</a></li>
+                        }
+
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<style>
+    @@media (max-width: 767px) {
+        aside {
+            display: none;
+        }
+    }
+
+    @@media screen and (min-width: 0px) and (max-width: 400px) {
+        #hej {
+            display: block;
+        }
+        /* show it on small screens */
+    }
+
+    @@media screen and (min-width: 401px) and (max-width: 1024px) {
+        #hej {
+            display: none;
+        }
+        /* hide it elsewhere */
+    }
+</style>
+
+

@@ -1,0 +1,61 @@
+﻿#dashboardPic {
+    max-height: 100px;
+    max-width: 100px;
+}
+
+.info {
+    margin-left: 15%;
+}
+
+.navbar {
+    position: relative;
+}
+
+@supports (-moz-appearance:none) {
+    #navbarl {
+        -moz-transform: scale(0.9, 0.9); /* Moz-browsers */
+        width: 110%;
+    }
+}
+
+#navbarl {
+    zoom: 0.9; /* Other non-webkit browsers */
+    zoom: 90%; /* Webkit browsers */
+    background: #CBCE91FF; /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #243B55, #141E30); /* Chrome 10-25, Safari 5.1-6 */
+    background: #CBCE91FF; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    height: 50px;
+}
+
+.fa-bullhorn {
+    padding-right: 5px;
+}
+
+.navbar-brand {
+    position: fixed;
+    left: 50%;
+    display: inline;
+    top: -2.4%;
+}
+
+#fullName {
+    color: #EEE;
+    font-weight: 100;
+    margin-top: 16px;
+    display: block;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.container-fluid {
+    -moz-transform: scale(0.9, 0.9);
+    zoom: 0.90;
+    zoom: 90%;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+.dropdown-menu {
+    background: #CBCE91FF;
+}

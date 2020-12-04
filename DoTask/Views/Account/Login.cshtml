@@ -1,0 +1,42 @@
+﻿@using DoTask.Models
+@model LoginViewModel
+@{
+    Layout = null;
+}
+<head>
+    <link href="~/Content/LoginForm.css" rel="stylesheet" />
+</head>
+<img id="backImage" src="https://miro.medium.com/max/3000/1*XCbgylbXDWd3_gUmowvd0w.png" />
+<div class="right">
+    <div class="content">
+        <h2>Login</h2>
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new
+        {
+            id = "loginForm"
+        }))
+        {
+        <div class="form-element form-stack">
+            @Html.LabelFor(x => x.UserName, new { @class = "form-label" })
+            @Html.EditorFor(x => x.UserName, new { @id = "username-login" })
+            @Html.ValidationMessageFor(x => x.UserName, "", new { @class = "text-danger" })
+
+        </div>
+                <div class="form-element form-stack">
+                    @Html.LabelFor(x => x.Password, new { @class = "form-label" })
+                    @Html.EditorFor(x => x.Password, new { @id = "password-login" })
+                    @Html.ValidationMessageFor(x => x.Password, "", new { @class="text-danger"})
+                </div>
+                <div class="form-element form-submit">
+                    <button id="logIn" class="login" type="submit" name="login">Log In</button>
+                </div>
+            }
+        </div>
+</div>
+
+
+
+<style>
+    .right {
+        background: #CBCE91FF;
+    }
+</style>

@@ -1,0 +1,111 @@
+﻿
+.side-nav {
+    -moz-transform: scale(0.9, 0.9);
+    zoom: 0.9; 
+    zoom: 90%; 
+    float: left;
+    height: 100%;
+    width: 12%;
+    background:#2E0077; 
+    color: #CCC;
+    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
+    transform: translateX(0);
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: auto;
+    z-index: 9999999
+}
+
+
+    .side-nav .heading {
+        padding: 10px 15px 15px 30px;
+        overflow: hidden;
+        border-bottom: 1px solid #2a2b3c
+    }
+
+
+    .side-nav .info {
+        float: left;
+        width: 69%;
+        margin-left: 3%;
+    }
+
+    .side-nav .heading .info > h3 {
+        margin: 0 0 5px
+    }
+
+        .side-nav .heading .info > h3 > a:hover {
+            color: #FFF;
+        }
+
+h1,
+p {
+    padding: 0;
+    margin: 0;
+    color: var(--secondaryColor);
+}
+
+.side-nav .heading .info > p {
+    color: #BBB;
+    font-size: 13px;
+}
+/* End heading */
+
+
+.side-nav .categories > li {
+    padding: 17px 40px 17px 30px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+}
+
+    .side-nav .categories > li > a {
+        color: #CBCE91FF;
+        text-decoration: none;
+    }
+        /* Start num: there are three options primary, danger and success like Bootstrap */
+        .side-nav .categories > li > a > .num {
+            line-height: 0;
+            border-radius: 3px;
+            font-size: 14px;
+            color: #FFF;
+            padding: 0px 5px
+        }
+
+.dang {
+    background-color: #f35959
+}
+
+.prim {
+    background-color: #0275d8
+}
+
+.succ {
+    background-color: #5cb85c
+}
+/* End num */
+.side-nav .categories > li > a:hover {
+    color: #FFF;
+}
+
+.side-nav .categories > li > i {
+    font-size: 18px;
+    margin-right: 20px
+}
+
+
+.side-nav .categories p {
+    margin-left: 30px;
+    color: #535465;
+    margin-top: 10px;
+}
+
+/* End dropdown menu */
+
+.show-side-nav {
+    -webkit-transform: translateX(-290px);
+    -moz-transform: translateX(-290px);
+    transform: translateX(-290px);
+}
