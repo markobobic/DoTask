@@ -53,9 +53,19 @@ namespace DoTask.Controllers
         {
             if(await db.AdminUserExist()) {
             var user = await UserManager.FindByIdAsync(id);
-            var result = await UserManager.DeleteAsync(user);
-            if(result.Succeeded)
-            return Json(new { success = true, message = "Deleted Successfully" }, JsonRequestBehavior.AllowGet);
+                try
+                {
+                    await db.DeleteProjectWithProjectManager(user);
+                    var result = await UserManager.DeleteAsync(user);
+                    if (result.Succeeded)
+                        return Json(new { success = true, message = "Deleted Successfully" }, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception e)
+                {
+
+                    throw e;
+                }
+           
         }
             return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }

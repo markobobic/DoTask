@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using DoTask.Helpers;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 
@@ -41,7 +43,7 @@ namespace DoTask.Models
         public string LastName { get; set; }
         public string PhotoType { get; set; }
         public byte[] Photo { get; set; }
-
+        [CascadeDelete]
         public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
 
         
@@ -66,7 +68,11 @@ namespace DoTask.Models
             this.Configuration.AutoDetectChangesEnabled = true;
 
         }
-
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Conventions.Add<CascadeDeleteAttributeConvention>();
+        }
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();

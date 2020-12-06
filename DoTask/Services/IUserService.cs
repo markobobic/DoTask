@@ -20,7 +20,7 @@ namespace DoTask.Services
         Task<bool> AdminUserExist();
         void CreateUser(ApplicationUser user);
         void UpdateUser(ApplicationUser user);
-        void DeleteUser(ApplicationUser user);
+        Task DeleteProjectWithProjectManager(ApplicationUser user);
         ApplicationUser MapData(ApplicationUser user, UserUpdateViewModel userUpdate, HttpPostedFileBase image);
 
     }

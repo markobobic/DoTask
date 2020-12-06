@@ -1,1 +1,221 @@
-﻿
+﻿@{
+    ViewBag.Title = "Index";
+}
+    <heaad>
+        <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
+        <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.print.css" rel="stylesheet" media="print" />
+    </heaad>
+<div class="container">
+    <br /><br /><br />
+    <div id="calender"></div>
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><span id="eventTitle"></span></h4>
+                </div>
+                <div class="modal-body">
+                    <button id="btnEdit" class="btn btn-info btn-sm pull-right" style="margin-right:5px;">
+                        <span class="glyphicon glyphicon-pencil"></span> Edit
+                    </button>
+                    <p id="pDetails"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="myModalSave" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+                    <form>
+                        <input type="hidden" id="hdEventID" value="0" />
+                        <div class="form-group">
+                            <label for="StatusId"><h4>Status</h4></label>
+                            @Html.DropDownList("StatusId", (IEnumerable<SelectListItem>)ViewBag.Statuses, null, new { @class = "form-control",@id="dropdownStatus" })
+</div>
+                       
+                        <div class="form-group">
+                            <label for="Progress">Progress</label>
+                            <input id="progress" class="form-control"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Description">Description</label>
+                            <textarea id="description" rows="3" class="form-control"></textarea>
+                        </div>
+
+                        <button type="button" id="btnSave" class="btn btn-info">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var events = [];
+            var selectedEvent = null;
+            FetchEventAndRenderCalendar();
+            function FetchEventAndRenderCalendar() {
+                events = [];
+                $.ajax({
+                    type: "GET",
+                    url: "/Assignment/GetDevTasks",
+                    success: function (data) {
+                        $.each(data, function (i, v) {
+                            events.push({
+                                assigmentId: v.AssigmentId,
+                                description: v.Description,
+                                assigmentName: v.AssigmentName,
+                                progress: v.Progress,
+                                statusId: v.StatusId,
+                                projectName: v.ProjectName,
+                                start: moment(v.Start),
+                                end: moment(v.End),
+                                statusName: v.StatusName,
+                                assigmentName: v.AssigmentName
+                                
+                            });
+                        })
+
+                        GenerateCalender(events);
+                    },
+                    error: function (error) {
+                        alert('failed');
+                    }
+                })
+            }
+
+            function GenerateCalender(events) {
+
+                $('#calender').fullCalendar('destroy');
+                $('#calender').fullCalendar({
+                    contentHeight: 400,
+                    defaultDate: new Date(),
+                    timeFormat: 'h(:mm)a',
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'basicWeek,basicDay,month'
+                    },
+                    defaultView: 'basicWeek',
+                    eventLimit: true,
+                    events: events,
+                    eventClick: function (calEvent, jsEvent, view) {
+
+                        selectedEvent = calEvent;
+                        $('#myModal #eventTitle').text(calEvent.title);
+                        var $description = $('<div/>');
+                        $description.append($('<p/>').html('<b>Task name:</b>' + calEvent.assigmentName));
+                        $description.append($('<p/>').html('<b>Project:</b>' + calEvent.projectName));
+                        $description.append($('<p/>').html('<b>Status:</b>' + calEvent.statusName));
+                        $description.append($('<p/>').html('<b>Progress:</b>' + calEvent.progress));
+                        $description.append($('<p/>').html('<b>Start:</b>' + calEvent.start.format("DD-MMM-YYYY HH:mm a")));
+                        if (calEvent.end != null) {
+                            $description.append($('<p/>').html('<b>Deadline:</b>' + calEvent.end.format("DD-MMM-YYYY HH:mm a")));
+                        }
+                        $description.append($('<p/>').html('<b>Description:</b>' + calEvent.description));
+                        $('#myModal #pDetails').empty().html($description);
+
+                        $('#myModal').modal();
+                    }, eventAfterRender: function (event, element, view) {
+                        if (event.statusId == 3) {
+                            element.css('background-color', '#1dc9b7');
+                        } else if (event.statusId == 1) {
+                            element.css('background-color', 'red');
+                        } else if (event.statusId = 2) {
+                            element.css('background-color', '#243B55');
+                        }
+                   
+                    },
+                    editable: true,
+                    eventDrop: function (event) {
+                        var data = {
+                            AssigmentId: event.assigmentId,
+                            StatusId: event.statusId,
+                            Progress: event.progress,
+                            Description: event.description,
+                        };
+                        SaveEvent(data);
+                    },
+                    eventRender: function (event, element) {
+                        if (event.statusId == 1) {
+                            element.find('.fc-time').empty();
+                            element.find('.fc-title').empty().append("Task name: " + event.assigmentName + "  ,Status: " +
+                                event.statusName + " ,Project name: " + event.projectName);
+                        } else if (event.statusId == 2) {
+                            element.find('.fc-time').empty();
+                            element.find('.fc-title').empty().append("Task name: " + event.assigmentName + "  ,Status: " +
+                                event.statusName + " ,Project name: " + event.projectName);
+                        } else if (event.statusId == 3) {
+                            element.find('.fc-time').empty();
+                            element.find('.fc-title').empty().append("Task name: " + event.assigmentName + "  ,Status: " +
+                                event.statusName + " ,Project name: " + event.projectName);
+                        }
+                    },
+                })
+            }
+
+            $('#btnEdit').click(function () {
+                openAddEditForm();
+            })
+            function openAddEditForm() {
+                if (selectedEvent != null) {
+                    $('#hdEventID').val(selectedEvent.assigmentId);
+                    $('#dropdownStatus').val(selectedEvent.statusId);
+                    $('#progress').val(selectedEvent.progress);
+                    $('#description').val(selectedEvent.description);
+
+                }
+                $('#myModal').modal('hide');
+                $('#myModalSave').modal();
+            }
+
+            $('#btnSave').click(function () {
+                var data = {
+                    AssigmentId: $('#hdEventID').val(),
+                    StatusId: $('#dropdownStatus').val(),
+                    Progress: $('#progress').val(),
+                    Description: $('#description').val(),
+                   
+                }
+                SaveEvent(data);
+            })
+
+            function SaveEvent(data) {
+                $.ajax({
+                    type: "POST",
+                    url: '/Assignment/UpdateByDeveloperTask',
+                    data: data,
+                    success: function (data) {
+                        if (data.status) {
+                            FetchEventAndRenderCalendar();
+                            $('#myModalSave').modal('hide');
+                        }
+                    },
+                    error: function () {
+                        alert('Failed');
+                    }
+                })
+            }
+        })
+    </script>
+}
+<style>
+   
+</style>

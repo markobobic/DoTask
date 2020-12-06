@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 </head>
 
-<aside class="side-nav" id="show-side-navigation">
+<aside class="side-nav text-center" id="show-side-navigation">
     <div class="heading cent text-center">
         @if (Model.Photo == null)
         {
@@ -29,23 +29,39 @@
             <p id="position">@Model.Position</p>
         </div>
     </div>
-    <ul class="categories text-center" style="margin-left:-5%">
+    <ul class="categories">
         @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
         {
             <li>
                 <i class="fas fa-user" aria-hidden="true"></i><a href="/Users/Index">Users</a>
             </li>
+            if (User.IsInRole("ProjectManager")) {
+            <li>
+                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/Index">My Tasks</a>
+
+
+            </li>
+            }
             <li>
                 <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/Index">Tasks</a>
             </li>
+            if (User.IsInRole("ProjectManager")) {
+            <li>
+                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/UnassignedProjectManager">Unassigned Tasks</a>
+            </li>
+            }
             <li>
                 <i class="fas fa-project-diagram" aria-hidden="true"></i><a href="/Projects/Index">Projects</a>
             </li>
         }
+        
         @if (User.IsInRole("Developer"))
         {
             <li>
-                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/Index">Tasks</a>
+                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/DeveloperTasks">My Tasks</a>
+            </li>
+            <li style="margin-right:-5% !important">
+                <i class="fas fa-user-minus" aria-hidden="true"></i><a href="/Assignment/UnassignedDevelopers">Unassigned</a>
             </li>
         }
     </ul>
@@ -101,6 +117,12 @@
         }
         /* hide it elsewhere */
     }
+   
+
+   
+        i{
+            margin-right:5%!important;
+        }
 </style>
 
 

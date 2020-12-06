@@ -6,19 +6,18 @@ using System.Web;
 
 namespace DoTask.VievModels
 {
-    public class AssignmentViewModel
+    public class DeveloperCalendarViewModel
     {
-        public string AssigmentName { get; set; }
+        public int AssigmentId { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime Deadline { get; set; }
+        public DateTime Start { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime StartDate { get; set; }
-        public int StatusId { get; set; }
-        public int ProjectId { get; set; }
-        public string DeveloperId { get; set; }
-        public string ProjectManagerId { get; set; }
+        public DateTime End { get; set; }
         public string Description { get; set; }
+        public int StatusId { get; set; }
+        public string ProjectName { get; set; }
         public double Progress { get; set; }
-
+        public string AssigmentName { get; set; }
+        public string StatusName { get; set; }
     }
 }

@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
+
 namespace DoTask.Services
 {
     public class UsersService : GenericRepo<ApplicationUser>, IUserService
@@ -28,9 +29,14 @@ namespace DoTask.Services
             Create(user);
         }
 
-        public void DeleteUser(ApplicationUser user)
+        public async Task DeleteProjectWithProjectManager(ApplicationUser user)
         {
-            Delete(user);
+            var project = await db.Projects.Where(x => x.ProjectManagerId == user.Id).SingleOrDefaultAsync();
+            if (project != null)
+            {
+                db.Projects.Remove(project);
+            }
+            await db.SaveChangesAsync();
         }
         public async Task<IEnumerable<UserViewModel>> GetAllUsersWithRoles()
         {
@@ -112,6 +118,20 @@ namespace DoTask.Services
             return user;
         }
 
-       
+        protected void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null)
+                {
+                    db.Dispose();
+                }
+            }
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

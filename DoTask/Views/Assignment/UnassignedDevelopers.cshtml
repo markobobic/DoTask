@@ -1,17 +1,14 @@
-﻿@{
-    string isAdmin = Request.IsAuthenticated && User.IsInRole("Admin") ? "true" : "false";
-    string isProjectManager = Request.IsAuthenticated && User.IsInRole("ProjectManager") ? "true" : "false";
-}
-
-    <head>
-        <link rel="stylesheet" href="~/Content/DataTable.css" />
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
-        <link rel="stylesheet" href=" https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css" />
-    </head>
+﻿<head>
+    <link rel="stylesheet" href="~/Content/DataTable.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href=" https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css" />
+</head>
 <br />
-<br /> <br /> <br />
+<br />
+<br />
+<br />
 <div class="modal fade" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
- 
+
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -57,11 +54,13 @@
         zoom: 0.9; /* Other non-webkit browsers */
         zoom: 90%; /* Webkit browsers */
     }
+
     #modalAdd {
         -moz-transform: scale(0.9, 0.9); /* Moz-browsers */
         zoom: 0.9; /* Other non-webkit browsers */
         zoom: 90%; /* Webkit browsers */
     }
+
     #tasksTable_paginate {
         margin-right: 1.2%;
     }
@@ -73,12 +72,11 @@
     <script src="https://rawgit.com/makeusabrew/bootbox/f3a04a57877cab071738de558581fbc91812dce9/bootbox.js"></script>
     <script>
         $(document).ready(function () {
-            let UserIsAdmin = @Html.Raw(isAdmin);
-            let UserIsProjectManager = @Html.Raw(isProjectManager);
+           
             aync:true
             dataTable = $("#tasksTable").DataTable({
                 "ajax": {
-                    "url": "/Assignment/GetData/",
+                    "url": "/Assignment/GetUnassignedData/",
                     "type": "GET",
                     "datatype": "json",
                     "dataSrc": ""
@@ -193,7 +191,7 @@
             return false;
         }
 
-        
+
         function Unassign(id) {
             bootbox.confirm({
                 message: "Are you sure you want to unassign?",
@@ -252,7 +250,7 @@
                 });
 
             }
-       
+
 
     </script>
 }

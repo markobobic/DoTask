@@ -12,6 +12,8 @@ namespace DoTask.VievModels
         public string AssigmentName { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Deadline { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime StartDate { get; set; }
         public int StatusId { get; set; }
         public int? ProjectId { get; set; }
         public string DeveloperId { get; set; }
@@ -23,11 +25,12 @@ namespace DoTask.VievModels
         {
 
         }
-        public AssignmentUpdateViewModel(int id,string assignmentName,DateTime deadline,
+        public AssignmentUpdateViewModel(int id,string assignmentName,DateTime startDate,DateTime deadline,
         int statusId,int? projectId,string description,double progress)
         {
             Id = id;
             AssigmentName = assignmentName;
+            StartDate = startDate;
             Deadline = deadline;
             StatusId = statusId;
             ProjectId = projectId;

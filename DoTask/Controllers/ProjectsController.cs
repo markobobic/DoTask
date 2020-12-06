@@ -72,7 +72,7 @@ namespace DoTask.Controllers
 
                 }
                 ProjectUpdateViewModel viewModel = new ProjectUpdateViewModel(project.Code,project.Name,
-                 project.ProjectManagerId,id);
+                 project.ProjectManagerId, id);
                 ViewBag.ProjectManagers = await db.IncludeRoles();
                 return View(viewModel);
             }

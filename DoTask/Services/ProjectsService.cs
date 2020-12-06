@@ -68,7 +68,16 @@ namespace DoTask.Services
 
         public async Task SaveChangesAsync()
         {
-            await db.SaveChangesAsync();
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+           
         }
 
         public void UpdateProject(Project project)
@@ -114,6 +123,21 @@ namespace DoTask.Services
             project.ProjectManager = projectManager;
             project.Code = updateViewModel.Code;
             return project;
+        }
+        protected void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (db != null)
+                {
+                    db.Dispose();
+                }
+            }
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
