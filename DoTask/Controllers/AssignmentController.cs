@@ -1,4 +1,5 @@
-﻿using DoTask.Models;
+﻿using DoTask.Helpers;
+using DoTask.Models;
 using DoTask.Services;
 using DoTask.VievModels;
 using Microsoft.AspNet.Identity;
@@ -68,7 +69,7 @@ namespace DoTask.Controllers
                 {
                     AssignmentUpdateViewModel viewModel = new AssignmentUpdateViewModel(assignment.Id, assignment.Name, assignment.Deadline,
                        assignment.StartDate, assignment.StatusId, assignment.ProjectId, assignment.Decription, assignment.Progress);
-                    if ((assignment.Developers.Count == 0 && assignment.ProjectId != null && assignment.AssingToNone == true) || (assignment.Developers.Count > 0 && assignment.ProjectId != null))
+                    if ((assignment.Developers.Count>0) || (assignment.AssingToNone==true && assignment.ProjectId!=null && assignment.Project.ProjectManagerId!=null))
                     {
                         var developer = db.GetDeveloperWithTask(assignment);
                         ViewBag.Developers = await db.IncludeDevelopersDropdown(assignment.AssingToNone, developer);
@@ -77,8 +78,6 @@ namespace DoTask.Controllers
                         return View(viewModel);
                     }
                     var projectManager = await db.GetProjectManagerWithTask(viewModel.ProjectId);
-                    ViewBag.ProjectManagers = await db.IncludeProjectManagersDropdown(projectManager);
-                    ViewBag.Projects = await db.IncludeProjectsDropdown(viewModel.ProjectId);
                     ViewBag.Statuses = await db.IncludeStatusesDropdown(viewModel.StatusId);
                     viewModel.ProjectManagerId = projectManager == null ? "None" : projectManager.Id;
                     return View(viewModel);
@@ -166,21 +165,27 @@ namespace DoTask.Controllers
             return View(assignment);
 
         }
-        public async Task<JsonResult> GetProjectManager()
+
+        public async Task<ActionResult> GetProjects()
         {
-            var projectManagers = await db.GetAllProjectManagers();
-            return Json(projectManagers, JsonRequestBehavior.AllowGet);
+            var projects = await db.GetAllProjects();
+            return Json(projects, JsonRequestBehavior.AllowGet);
+
+           
         }
-        public async Task<ActionResult> GetProjects(string projectManagerId)
+
+        public async Task<JsonResult> GetProjectManager(int projectId)
         {
-            var projectsWithProjectManager = await db.GetProjectsWithProjectManagerId(projectManagerId);
-            if (projectsWithProjectManager.Count == 0 || projectManagerId == "None")
+            var projectsWithProjectManager = await db.GetProjectManagersWithProjectId(projectId);
+            if (projectsWithProjectManager.Count == 0 )
             {
-                var none = new List<CascadeDropdownProjectViewModel> { new CascadeDropdownProjectViewModel { ProjectId = 0, Name = "None" } };
-                return Json(none, JsonRequestBehavior.AllowGet);
+                var dropdown = await db.IncludeProjectManagersDropdown();
+                var data = dropdown.Select(x => new CascadeDropdownProjectViewModel { ProjectId = x.Value.ToInt32(), Name = x.Text });
+                return Json(data, JsonRequestBehavior.AllowGet);
             }
             return Json(projectsWithProjectManager, JsonRequestBehavior.AllowGet);
         }
+        
 
         [HttpPost]
         public async Task<ActionResult> Unassign(int id)
@@ -188,6 +193,57 @@ namespace DoTask.Controllers
             await db.Unassign(id);
 
             return Json(new { success = true, message = "Unassigned Successfully" }, JsonRequestBehavior.AllowGet);
+
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> ProjectManagerTasks()
+        {
+
+            ViewBag.Statuses = await db.IncludeStatusesDropdown();
+            return View();
+        }
+
+        public async Task<JsonResult> GetProjectManagerTasks()
+        {
+            string currentUserId = User.Identity.GetUserId();
+            ApplicationUser currentUser = await db.GetCurrentUserWithTasks(currentUserId);
+            var calendarData =await db.GetProjectManagerCalendarDataAsync(currentUser);
+            return new JsonResult { Data = calendarData, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+
+        }
+        public async Task<ActionResult> UpdateByProjectManagerTask(ProjectManagerCalendarViewModel viewModel)
+        {
+            var updatedAssigment = await db.UpdateMapByProjectManagerTask(viewModel);
+            db.UpdateAssignment(updatedAssigment);
+            await db.SaveChangesAsync();
+            return new JsonResult { Data = new { status = "save" } };
+
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> ProjectsTaskDevelopers()
+        {
+
+            ViewBag.Statuses = await db.IncludeStatusesDropdown();
+            ViewBag.Developers = await db.IncludeDevelopersDropdown();
+            return View();
+        }
+
+        public async Task<JsonResult> GetProjectTasksDevelopers()
+        {
+            string currentUserId = User.Identity.GetUserId();
+            ApplicationUser currentUser = await db.GetCurrentUserWithTasks(currentUserId);
+            var calendarData = await db.GetProjectTasksDevelopersDataAsync(currentUser);
+            return new JsonResult { Data = calendarData, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+
+        }
+        public async Task<ActionResult> UpdateByProjectTasksDevelopers(ProjectTaskCalendarUpdateViewModel viewModel)
+        {
+            var updatedAssigment = await db.UpdateMapByProjectManerDeveloperTask(viewModel);
+            db.UpdateAssignment(updatedAssigment);
+            await db.SaveChangesAsync();
+            return new JsonResult { Data = new { status = "save" } };
 
         }
 
@@ -234,13 +290,61 @@ namespace DoTask.Controllers
         {
             return View();
         }
-
+        [HttpGet]
+        public ActionResult UnassignedProjectManagers()
+        {
+            return View();
+        }
 
         public async Task<ActionResult> GetUnassignedData()
         {
+            if (User.IsInRole(RoleName.Developer)) { 
             var data = await db.GetUnnasignedDeveloperTask();
             return Json(data, JsonRequestBehavior.AllowGet);
-
+            }
+            if (User.IsInRole(RoleName.ProjectManager))
+            {
+                var data = await db.GetUnnasignedProjectManagers();
+                return Json(data, JsonRequestBehavior.AllowGet);
+            }
+            return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
         }
+
+
+        public async Task<ActionResult> AddToDeveloper()
+        {
+           
+            ViewBag.Statuses = await db.IncludeStatusesDropdown();
+            ViewBag.Developers = await db.IncludeDevelopersDropdown();
+            var currentProjectManager = await db.GetCurrentUser();
+            ViewBag.Projects = await db.IncludeManagedProjectsByProjectM(currentProjectManager.Id);
+            ViewBag.ProjectManagerId = currentProjectManager.Id;
+            ViewBag.ProjectManagerName = currentProjectManager.FullName;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AddToDeveloper(AssignmentViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var assigment = await db.MapData(viewModel);
+                db.CreateAssignment(assigment);
+                await db.SaveChangesAsync();
+                RedirectToAction("ProjectsTaskDevelopers");
+
+            }
+            ViewBag.Statuses = await db.IncludeStatusesDropdown();
+            ViewBag.Developers = await db.IncludeDevelopersDropdown();
+            var currentProjectManager = await db.GetCurrentUser();
+            ViewBag.Projects = await db.IncludeManagedProjectsByProjectM(currentProjectManager.Id);
+            ViewBag.ProjectManagerId = currentProjectManager.Id;
+            ViewBag.ProjectManagerName = currentProjectManager.FullName;
+            return RedirectToAction("ProjectsTaskDevelopers");
+        }
+
+
+
     }
 }

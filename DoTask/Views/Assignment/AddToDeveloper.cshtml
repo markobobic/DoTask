@@ -1,0 +1,115 @@
+﻿@model  DoTask.VievModels.AssignmentViewModel
+@{ Layout = null; }
+
+    <head>
+        <link href="~/Content/SwitchButton.css" rel="stylesheet" />
+        <link href="~/Content/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    </head>
+@using (Html.BeginForm("AddToDeveloper", "Assignment", FormMethod.Post, new { onsubmit = "return SubmitForm(this)",@id="myForm" }))
+{
+@Html.AntiForgeryToken()
+    <div class="form-group">
+        @Html.LabelFor(model => model.AssigmentName, htmlAttributes: new { @class = "control-label col-md-8" })
+        <div class="row">
+            @Html.EditorFor(model => model.AssigmentName, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.AssigmentName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-6" })
+        <div class="row">
+            @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control datetimepicker" } })
+            @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    
+   <div class="form-group">
+        @Html.LabelFor(model => model.Deadline, htmlAttributes: new { @class = "control-label col-md-6" })
+        <div class="row">
+            @Html.EditorFor(model => model.Deadline, new { htmlAttributes = new { @class = "form-control datetimepicker" } })
+            @Html.ValidationMessageFor(model => model.Deadline, "", new { @class = "text-danger" })
+        </div>
+    </div>
+   
+    <div class="form-group">
+        @Html.LabelFor(model => model.Progress, htmlAttributes: new { @class = "control-label col-md-6" })
+        <div class="row">
+            <input class="form-control" data-val="true" data-val-number="The field Progress must be a number." 
+                   data-val-required="The Progress field is required." id="Progress" name="Progress"
+                   readonly="readonly" type="text" value="0"></div>
+    </div>
+    
+
+    <div class="form-group" id="dropdownDeveloper">
+        <label class="control-label col-md-6" for="DeveloperId">Developers</label>        
+        <div class="row">
+            @Html.DropDownList("DeveloperId", (IEnumerable<SelectListItem>)ViewBag.Developers,null, new { @class = "form-control",@id="developers" })
+        </div>
+    </div>
+      
+
+
+       <div class="form-group" id="dropDownProjectsForDeveloper">
+        <label class="control-label col-md-6" for="ProjectId">Projects</label>        
+        <div class="texte-center row">
+            @Html.DropDownList("ProjectId", (IEnumerable<SelectListItem>)ViewBag.Projects, null, new { @class = "form-control",@id="projectsForDeveloper" })
+        </div>
+         </div>
+
+          <div class="form-group">
+        <label class="control-label col-md-6" for="ProjectManagerId">Project Manager</label>        
+        <div class="texte-center row">
+            <select readonly name="ProjectManagerId" id="forProjectManager" class="form-control">
+                <option selected  value="@ViewBag.ProjectManagerId">@ViewBag.ProjectManagerName</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-md-6" for="StatusId">Status</label>        
+        <div class="texte-center row">
+            @Html.DropDownList("StatusId", (IEnumerable<SelectListItem>)ViewBag.Statuses, null, new { @class = "form-control" })
+        </div>
+    </div>
+     
+    <div class="form-group">
+        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-8" })
+        <div class="row">
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 5, id = "description" })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+        <div class="form-group">
+            <div class="text-center">
+                <input type="submit" id="formSubmit" class="btn btn-success" value="Save" />
+                <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">Cancel</button>
+            </div>
+        </div>                  
+        <style>
+            .form-control {
+                margin-left: 5%;
+                width:90%;
+            }
+        </style>
+                                
+  }
+
+
+
+<script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
+<script src="~/Scripts/moment.min.js"></script>
+
+
+<script>
+    $(function () {
+        $('.datetimepicker').datetimepicker({
+            format: 'MM-DD-YYYY'
+        });
+
+        $('.datetimepicker-addon').on('click', function () {
+            $(this).prev('input.datetimepicker').data('DateTimePicker').toggle();
+        });
+    });
+
+</script>

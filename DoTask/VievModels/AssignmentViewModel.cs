@@ -9,9 +9,7 @@ namespace DoTask.VievModels
     public class AssignmentViewModel
     {
         public string AssigmentName { get; set; }
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Deadline { get; set; }
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime StartDate { get; set; }
         public int StatusId { get; set; }
         public int ProjectId { get; set; }

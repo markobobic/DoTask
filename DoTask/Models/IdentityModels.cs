@@ -34,12 +34,14 @@ namespace DoTask.Models
         [Display(Name = "First Name")]
         [StringLength(maximumLength: 20, MinimumLength = 1, ErrorMessage = "First name must be between 1 and 20 characters!")]
         [Required(ErrorMessage = "You must provide first name")]
+        [Index]
         public string FirstName { get; set; }
         [DisplayFormat(ConvertEmptyStringToNull = false)]
         [RegularExpression(@"^\w+( +\w+)*$|", ErrorMessage = "Spaces can only exist beetween words")]
         [Display(Name = "Last Name")]
         [StringLength(maximumLength: 50, MinimumLength = 1, ErrorMessage = "Last name must be between 1 and 20 characters!")]
         [Required(ErrorMessage = "You must provide last name")]
+        [Index]
         public string LastName { get; set; }
         public string PhotoType { get; set; }
         public byte[] Photo { get; set; }

@@ -19,7 +19,7 @@
         @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-6" })
         <div class="row">
             @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control datetimepicker" } })
-            @Html.ValidationMessageFor(model => model.Deadline, "", new { @class = "text-danger" })
+            @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
         </div>
     </div>
     
@@ -68,14 +68,14 @@
             @Html.DropDownList("DeveloperId", (IEnumerable<SelectListItem>)ViewBag.Developers,null, new { @class = "form-control",@id="developers" })
         </div>
     </div>
-    <div class="form-group" id="dropdownProjectManager">
+    <div class="form-group" id="dropdDownProjectForProjectManager">
         <div class="row">
-            <label class="control-label col-md-6" for="ProjectManagerId">Project Manager</label>
-            <select class="form-control" id="projectManagers" name="ProjectManagerId">
-                <option selected="selected">None</option>
+            <label class="control-label col-md-6" for="ProjectId">Projects</label>
+            <select class="form-control" id="projects" name="ProjectId">
+                
             </select>
         </div>
-      </div>
+    </div>
       
        <div class="form-group" id="dropDownProjectsForDeveloper">
         <label class="control-label col-md-6" for="ProjectId">Projects</label>        
@@ -90,14 +90,15 @@
             @Html.DropDownList("StatusId", (IEnumerable<SelectListItem>)ViewBag.Statuses, null, new { @class = "form-control" })
         </div>
     </div>
-     <div class="form-group" id="dropdDownForProjectManager">
+     <div class="form-group" id="dropdownProjectManager">
         <div class="row">
-            <label for="ProjectId">Projects</label>
-            <select class="form-control" id="projects" name="ProjectId">
-
+            <label class="control-label col-md-6" for="ProjectManagerId">Project Manager</label>
+            <select class="form-control" id="projectManagers" name="ProjectManagerId">
+                
             </select>
         </div>
-    </div>
+      </div>
+     
     <div class="form-group">
         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-8" })
         <div class="row">
@@ -124,25 +125,28 @@
         $("#dropdownDeveloper").hide();
         $("#dropdownProjectManager").hide();
         $("#dropDownProjectsForDeveloper").hide();
-        $("#dropdDownForProjectManager").hide();
+        $("#dropdDownProjectForProjectManager").hide();
         $("#developers").prop('disabled', true);
         $("#projectManagers").prop('disabled', true);
         $('#toDeveloper').click(function () {
             let checking = $(this).prop("checked");
-          
+
             if (checking === true) {
                 $("#toProjectManager").prop('disabled', true);
                 $('#errorSwitch').hide();
-                $("#dropdDownForProjectManager").hide();
+                $("#dropdDownProjectForProjectManager").hide();
                 $("#dropdownDeveloper").show();
                 $("#dropDownProjectsForDeveloper").show();
                 $("#developers").prop('disabled', false);
+                $("#projects").prop('disabled', true);
+
             } else if (checking === false) {
                 $('#errorSwitch').hide();
                 $("#toProjectManager").prop('disabled',false);
                 $("#dropdownDeveloper").hide();
                 $("#developers").prop('disabled', true);
-             
+                $("#projects").prop('disabled', false);
+
             }
         });
         $('#toProjectManager').click(function () {
@@ -150,13 +154,13 @@
             if (checking === true) {
                 $('#errorSwitch').hide();
                 $("#toDeveloper").prop('disabled', true);
-                $("#dropdDownForProjectManager").show();
+                $("#dropdDownProjectForProjectManager").show();
                 $("#dropDownProjectsForDeveloper").hide();
                 $("#dropdownProjectManager").show();
                 $("#projectManagers").prop('disabled', false);
                 $("#projectsForDeveloper").prop('disabled', true);
-               
-                
+
+
             } else if (checking === false) {
                 $('#errorSwitch').hide();
                 $("#toDeveloper").prop('disabled', false);
@@ -164,41 +168,35 @@
                 $("#projectsForDeveloper").prop('disabled', false);
             }
         });
-        
+
         $(document).ready(function () {
 
-            $('#myForm').validate({ 
+            $('#myForm').validate({
                 rules: {
                     'toDeveloper': {
                         required: true,
                         maxlength: 2
                     },
-                }, 
+                },
                 messages: {
                     'toDeveloper': {
                         required: "Check at least 1 box",
                         maxlength: "Check no more than {0} boxes",
 
                     },
-                   
+
 
                 },
                 errorElement: 'p',
                 errorLabelContainer: '.errorTxt',
-              
-                submitHandler: function (form) { // for demo
-                    alert('valid form submitted'); // for demo
-                   
-                }
-
             });
-            
+
 
         });
 
         $(function () {
             $('.datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD'
+                format: 'MM-DD-YYYY'
             });
 
             $('.datetimepicker-addon').on('click', function () {
@@ -208,15 +206,17 @@
 
 
         $(document).ready(function () {
-            $.getJSON('/Assignment/GetProjectManager', null, function (data) {
+            $.getJSON('/Assignment/GetProjects', null, function (data) {
                 $.each(data, function () {
-                    $('#projectManagers').append('<option value=' +
-                        this.Id + '>' + this.Name + '</option>');
+                    $('#projects').append('<option value=' +
+                        this.ProjectId + '>' + this.Name + '</option>');
                 });
-                $.getJSON('/Assignment/GetProjects', { projectManagerId: $('#projectManagers').val() }, function (data) {
+
+
+                $.getJSON('/Assignment/GetProjectManager', { projectId: $('#projects').val() }, function (data) {
                     $.each(data, function () {
-                        $('#projects').append('<option value=' +
-                            this.ProjectId + '>' + this.Name + '</option>');
+                        $('#projectManagers').append('<option value=' +
+                            this.Id + '>' + this.Name + '</option>');
                     });
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     //alert('Error getting client sectors!');
@@ -225,19 +225,19 @@
                 alert('Error getting projects!');
             });
 
-            $('#projectManagers').change(function () {
-                $('#projects option').remove();
-                $.getJSON('/Assignment/GetProjects', { projectManagerId: $('#projectManagers').val() }, function (data) {
+
+                $('#projects').change(function () {
+                    $('#projectManagers option').remove();
+                    $.getJSON('/Assignment/GetProjectManager', { projectId: $('#projects').val() }, function (data) {
                     $.each(data, function () {
-                        $('#projects').append('<option value=' +
-                            this.ProjectId + '>' + this.Name + '</option>');
+                       $('#projectManagers').append('<option value=' +
+                            this.Id + '>' + this.Name + '</option>');
                     });
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     alert('Error getting project managers!');
                 });
             });
         });
-        
 
     </script>
     

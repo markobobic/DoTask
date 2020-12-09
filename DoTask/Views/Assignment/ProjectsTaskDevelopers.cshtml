@@ -1,12 +1,38 @@
-﻿@{
+﻿@model DoTask.VievModels.ProjectManagerCalendarViewModel
+@{
     ViewBag.Title = "Index";
 }
-    <heaad>
-        <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
-        <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.print.css" rel="stylesheet" media="print" />
-    </heaad>
+<heaad>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.print.css" rel="stylesheet" media="print" />
+</heaad>
+
+
+
 <div class="container">
     <br /><br /><br />
+    <div class="modal fade" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="mTitle">Task</h4>
+                    <button id="close-modal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+    <a class="btn btn-success" style="margin-left:-15px;color:white" data-toggle="modal"
+       data-target="#modalAdd"
+       onclick="PopupForm('@Url.Action("AddToDeveloper","Assignment")')"><i class="fa fa-plus"></i> Add Task To Developer </a>
+    <br /><br />
     <div id="calender"></div>
 
     <div id="myModal" class="modal fade" role="dialog">
@@ -28,6 +54,7 @@
             </div>
         </div>
     </div>
+
     <div id="myModalSave" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
 
         <div class="modal-dialog">
@@ -36,16 +63,25 @@
 
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
 
+
                     <form>
                         <input type="hidden" id="hdEventID" value="0" />
                         <div class="form-group">
+                            <label for="DeveloperId"><h4>Developers</h4></label>
+                            @Html.DropDownList("DeveloperId", (IEnumerable<SelectListItem>)ViewBag.Developers, null, new { @class = "form-control", @id = "dropdownDevelopers" })
+                        </div>
+                        <div class="form-group">
                             <label for="StatusId"><h4>Status</h4></label>
-                            @Html.DropDownList("StatusId", (IEnumerable<SelectListItem>)ViewBag.Statuses, null, new { @class = "form-control",@id="dropdownStatus" })
-</div>
-                       
+                            @Html.DropDownList("StatusId", (IEnumerable<SelectListItem>)ViewBag.Statuses, null, new { @class = "form-control", @id = "dropdownStatus" })
+                        </div>
+
                         <div class="form-group">
                             <label for="Progress">Progress</label>
-                            <input id="progress" class="form-control"/>
+                            <input id="progress" class="form-control" />
+                        </div>
+                        <div class="form-group" id="divEndDate">
+                            <label for="End">Deadline</label>
+                            <input type="text" id="end" class="form-control datetimepicker" />
                         </div>
 
                         <div class="form-group">
@@ -61,11 +97,20 @@
         </div>
     </div>
 </div>
+<style>
+    #modalAdd {
+        -moz-transform: scale(0.9, 0.9); /* Moz-browsers */
+        zoom: 0.9; /* Other non-webkit browsers */
+        zoom: 90%; /* Webkit browsers */
+    }
+</style>
 
 
 @section Scripts{
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="~/Scripts/moment.min.js"></script>
+    <script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+
     <script>
         $(document).ready(function () {
             var events = [];
@@ -75,7 +120,7 @@
                 events = [];
                 $.ajax({
                     type: "GET",
-                    url: "/Assignment/GetDevTasks",
+                    url: "/Assignment/GetProjectTasksDevelopers",
                     success: function (data) {
                         $.each(data, function (i, v) {
                             events.push({
@@ -88,8 +133,10 @@
                                 start: moment(v.Start),
                                 end: moment(v.End),
                                 statusName: v.StatusName,
-                                assigmentName: v.AssigmentName
-                                
+                                assigmentName: v.AssigmentName,
+                                assignTo: v.AssignTo,
+                                developerId: v.DeveloperId
+
                             });
                         })
 
@@ -122,6 +169,7 @@
                         $('#myModal #eventTitle').text(calEvent.title);
                         var $description = $('<div/>');
                         $description.append($('<p/>').html('<b>Task name:</b>' + calEvent.assigmentName));
+                        $description.append($('<p/>').html('<b>Assign to:</b>' + calEvent.assignTo));
                         $description.append($('<p/>').html('<b>Project:</b>' + calEvent.projectName));
                         $description.append($('<p/>').html('<b>Status:</b>' + calEvent.statusName));
                         $description.append($('<p/>').html('<b>Progress:</b>' + calEvent.progress));
@@ -141,7 +189,7 @@
                         } else if (event.statusId = 2) {
                             element.css('background-color', '#243B55');
                         }
-                   
+
                     },
                     editable: true,
                     eventDrop: function (event) {
@@ -180,7 +228,9 @@
                     $('#dropdownStatus').val(selectedEvent.statusId);
                     $('#progress').val(selectedEvent.progress);
                     $('#description').val(selectedEvent.description);
-
+                    $('#end').val(selectedEvent.end.format('YYYY-MM-DD'));
+                    $('#dropdownDevelopers').val(selectedEvent.developerId);
+                    alert(selectedEvent.developerId);
                 }
                 $('#myModal').modal('hide');
                 $('#myModalSave').modal();
@@ -192,7 +242,8 @@
                     StatusId: $('#dropdownStatus').val(),
                     Progress: $('#progress').val(),
                     Description: $('#description').val(),
-                   
+                    End: $('#end').val().trim(),
+                    DeveloperId: $('#dropdownDevelopers').val(),
                 }
                 SaveEvent(data);
             })
@@ -200,7 +251,7 @@
             function SaveEvent(data) {
                 $.ajax({
                     type: "POST",
-                    url: '/Assignment/UpdateByDeveloperTask',
+                    url: '/Assignment/UpdateByProjectTasksDevelopers',
                     data: data,
                     success: function (data) {
                         if (data.status) {
@@ -214,8 +265,44 @@
                 })
             }
         })
+        $(function () {
+            $('.datetimepicker').datetimepicker({
+                format: 'MM-DD-YYYY'
+            });
+
+            $('.datetimepicker-addon').on('click', function () {
+                $(this).prev('input.datetimepicker').data('DateTimePicker').toggle();
+            });
+        });
+
+
+        function PopupForm(url) {
+
+            var formDiv = $('.modal-body');
+            $.get(url)
+                .done(function (response) {
+                    var modal = $(this);
+                    formDiv.html(response);
+                });
+        }
+        function SubmitForm(form) {
+            $.validator.unobtrusive.parse(form);
+            if ($(form).valid()) {
+                $.ajax({
+                    type: "POST",
+                    url: form.action,
+                    data: $(form).serialize(),
+                    success: function (data) {
+                        if (data.success) {
+                            $("#modalAdd").modal('hide');
+                           
+                        }
+                    }
+                });
+            }
+            return false;
+        }
     </script>
 }
 <style>
-   
 </style>

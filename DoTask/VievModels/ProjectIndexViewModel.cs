@@ -5,9 +5,11 @@ using System.Web;
 
 namespace DoTask.VievModels
 {
-    public class CascadeDropdownProjectManager
+    public class ProjectIndexViewModel
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
+        public string Code { get; set; }
         public string Name { get; set; }
+        public string ProjectManager { get; set; }
     }
 }

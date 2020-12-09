@@ -10,15 +10,14 @@ namespace DoTask.VievModels
     {
         public int Id { get; set; }
         public string AssigmentName { get; set; }
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Deadline { get; set; }
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime StartDate { get; set; }
         public int StatusId { get; set; }
         public int? ProjectId { get; set; }
         public string DeveloperId { get; set; }
         public string ProjectManagerId { get; set; }
         public string Description { get; set; }
+        [RegularExpression(@"^100(\.0{0,2})? *%?$|^\d{1,2}(\.\d{1,2})? *%?$", ErrorMessage = "From 0 to 100")]
         public double Progress { get; set; }
 
         public AssignmentUpdateViewModel()

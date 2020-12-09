@@ -30,41 +30,46 @@
         </div>
     </div>
     <ul class="categories">
-        @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
+        @if (User.IsInRole("Admin"))
         {
             <li>
-                <i class="fas fa-user" aria-hidden="true"></i><a href="/Users/Index">Users</a>
+                <i class="fas fa-user links" aria-hidden="true"></i><a href="/Users/Index">Users</a>
             </li>
-            if (User.IsInRole("ProjectManager")) {
             <li>
-                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/Index">My Tasks</a>
-
-
+                <i class="fas fa-tasks links" aria-hidden="true"></i><a href="/Assignment/Index">Tasks</a>
             </li>
-            }
             <li>
-                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/Index">Tasks</a>
-            </li>
-            if (User.IsInRole("ProjectManager")) {
-            <li>
-                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/UnassignedProjectManager">Unassigned Tasks</a>
-            </li>
-            }
-            <li>
-                <i class="fas fa-project-diagram" aria-hidden="true"></i><a href="/Projects/Index">Projects</a>
+                <i class="fas fa-project-diagram links" aria-hidden="true"></i><a href="/Projects/Index">Projects</a>
             </li>
         }
-        
-        @if (User.IsInRole("Developer"))
-        {
-            <li>
-                <i class="fas fa-tasks" aria-hidden="true"></i><a href="/Assignment/DeveloperTasks">My Tasks</a>
-            </li>
-            <li style="margin-right:-5% !important">
-                <i class="fas fa-user-minus" aria-hidden="true"></i><a href="/Assignment/UnassignedDevelopers">Unassigned</a>
-            </li>
-        }
-    </ul>
+            @if (User.IsInRole("ProjectManager"))
+            {
+                <li>
+                    <i class="fas fa-tasks links" aria-hidden="true"></i><a href="/Assignment/ProjectManagerTasks">My Tasks</a>
+                </li>
+                <li>
+                    <i class="fas fa-tasks links" aria-hidden="true"></i><a href="/Assignment/ProjectsTaskDevelopers">Developers Tasks</a>
+                </li>
+
+                <li style="margin-right:-5% !important">
+                    <i class="fas fa-user-minus links" aria-hidden="true"></i><a href="/Assignment/UnassignedProjectManagers">Unassigned</a>
+                </li>
+
+                <li>
+                    <i class="fas fa-project-diagram links" aria-hidden="true"></i><a href="/Projects/Index">Projects</a>
+                </li>   
+            }
+
+            @if (User.IsInRole("Developer"))
+            {
+                <li>
+                    <i class="fas fa-tasks links" aria-hidden="true"></i><a href="/Assignment/DeveloperTasks">My Tasks</a>
+                </li>
+                <li style="margin-right:-5% !important">
+                    <i class="fas fa-user-minus links" aria-hidden="true"></i><a href="/Assignment/UnassignedDevelopers">Unassigned</a>
+                </li>
+            }
+        </ul>
 </aside>
 <nav class="navbar-fixed-top navbar-expand-sm" id="navbarl">
     <div class="container-fluid">
@@ -87,7 +92,7 @@
                         {
                             @Html.AntiForgeryToken()
 
-                            @:<li class="text-center"> <a style="color:white;" class="nav-link" href="javascript:document.getElementById('logoutForm').submit()" <i class="fa fa-sign-out"></i>Log out</a></li>
+                            @:<li class="text-center"> <a style="color:#2E0077;" class="nav-link" href="javascript:document.getElementById('logoutForm').submit()" <i class="fa fa-sign-out"></i>Log out</a></li>
                         }
 
                     </ul>
@@ -117,12 +122,12 @@
         }
         /* hide it elsewhere */
     }
-   
 
-   
-        i{
-            margin-right:5%!important;
-        }
+
+
+    .links {
+        margin-right: 5% !important;
+    }
 </style>
 
 

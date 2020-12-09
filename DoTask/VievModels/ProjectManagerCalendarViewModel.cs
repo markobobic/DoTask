@@ -6,7 +6,7 @@ using System.Web;
 
 namespace DoTask.VievModels
 {
-    public class DeveloperCalendarViewModel
+    public class ProjectManagerCalendarViewModel
     {
         public int AssigmentId { get; set; }
         public DateTime Start { get; set; }
@@ -23,5 +23,7 @@ namespace DoTask.VievModels
         public double Progress { get; set; }
         public string AssigmentName { get; set; }
         public string StatusName { get; set; }
+
+      
     }
 }

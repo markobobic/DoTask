@@ -254,16 +254,27 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\AssignToNone.cs" />
     <Compile Include="Helpers\AutoMapperProfiles.cs" />
     <Compile Include="Helpers\AutoFacAndAutoMapper.cs" />
     <Compile Include="Helpers\CascadeDeleteAttribute.cs" />
     <Compile Include="Helpers\CascadeDeleteAttributeConvention.cs" />
+    <Compile Include="Helpers\Dropdown.cs" />
+    <Compile Include="Helpers\ExtensionMethods.cs" />
     <Compile Include="Helpers\SelectListComparer.cs" />
     <Compile Include="Helpers\SortedList.cs" />
     <Compile Include="Helpers\Utilities.cs" />
-    <Compile Include="Migrations\202012062348432_Initilize.cs" />
-    <Compile Include="Migrations\202012062348432_Initilize.Designer.cs">
-      <DependentUpon>202012062348432_Initilize.cs</DependentUpon>
+    <Compile Include="Migrations\202012070405203_Initilize.cs" />
+    <Compile Include="Migrations\202012070405203_Initilize.Designer.cs">
+      <DependentUpon>202012070405203_Initilize.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012071750100_Update7.cs" />
+    <Compile Include="Migrations\202012071750100_Update7.Designer.cs">
+      <DependentUpon>202012071750100_Update7.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012080615509_Indexes.cs" />
+    <Compile Include="Migrations\202012080615509_Indexes.Designer.cs">
+      <DependentUpon>202012080615509_Indexes.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -292,8 +303,16 @@
     <Compile Include="VievModels\DeveloperCalendarUpdateViewModel.cs" />
     <Compile Include="VievModels\DeveloperCalendarViewModel.cs" />
     <Compile Include="VievModels\IndexProfileViewModel.cs" />
+    <Compile Include="VievModels\ProjectIndexProjectManagerViewModel.cs" />
+    <Compile Include="VievModels\ProjectIndexViewModel.cs" />
+    <Compile Include="VievModels\ProjectManagerCalendarViewModel.cs" />
+    <Compile Include="VievModels\ProjectTaskCalendarIndexViewModel.cs" />
+    <Compile Include="VievModels\ProjectTaskCalendarUpdateViewModel.cs" />
     <Compile Include="VievModels\ProjectUpdateViewModel.cs" />
     <Compile Include="VievModels\ProjectViewModel.cs" />
+    <Compile Include="VievModels\TaskToDeveloperViewModel.cs" />
+    <Compile Include="VievModels\UnassignedDeveloperViewModel.cs" />
+    <Compile Include="VievModels\UnassignedProjectManagerViewModel.cs" />
     <Compile Include="VievModels\UserUpdateViewModel.cs" />
     <Compile Include="VievModels\UserViewModel.cs" />
   </ItemGroup>
@@ -389,6 +408,10 @@
     <Content Include="Views\Assignment\Update.cshtml" />
     <Content Include="Views\Assignment\AssignDeveloper.cshtml" />
     <Content Include="Views\Assignment\UnassignedDevelopers.cshtml" />
+    <Content Include="Views\Assignment\ProjectManagerTasks.cshtml" />
+    <Content Include="Views\Assignment\UnassignedProjectManagers.cshtml" />
+    <Content Include="Views\Assignment\ProjectsTaskDevelopers.cshtml" />
+    <Content Include="Views\Assignment\AddToDeveloper.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -405,8 +428,14 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202012062348432_Initilize.resx">
-      <DependentUpon>202012062348432_Initilize.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202012070405203_Initilize.resx">
+      <DependentUpon>202012070405203_Initilize.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012071750100_Update7.resx">
+      <DependentUpon>202012071750100_Update7.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012080615509_Indexes.resx">
+      <DependentUpon>202012080615509_Indexes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

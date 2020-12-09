@@ -67,6 +67,14 @@
     </div>*@
         
 
+        <div class="form-group" id="dropdownProjectsForProjectManager">
+            <div class="row">
+                <label class="control-label col-md-6" for="ProjectId">Projects</label>
+                <select class="form-control" id="projects" name="ProjectId">
+                </select>
+            </div>
+        </div>
+
       <div class="form-group" id="dropdownProjectManager">
         <div class="row">
             <label class="control-label col-md-6" for="ProjectManagerId">Project Manager</label>
@@ -75,15 +83,6 @@
             </select>
         </div>
       </div>
-
-
-      <div class="form-group" id="dropdDownForProjectManager">
-            <div class="row">
-                <label for="ProjectId">Projects</label>
-                <select class="form-control" id="projects" name="ProjectId">
-                </select>
-            </div>
-        </div>
 
 
     }
@@ -129,7 +128,7 @@
 
     $(function () {
         $('.datetimepicker').datetimepicker({
-            format: 'DD/MM/YYYY'
+            format: 'MM-DD-YYYY'
         });
 
         $('.datetimepicker-addon').on('click', function () {
@@ -138,29 +137,30 @@
     });
 
     $(document).ready(function () {
-         let projectId = @Html.Raw(projectId);
+          let projectId = @Html.Raw(projectId);
         let projectManagerId = '@Model.ProjectManagerId';
-        console.log(projectManagerId);
-        $.getJSON('/Assignment/GetProjectManager', null, function (data) {
+        $.getJSON('/Assignment/GetProjects', null, function (data) {
             $.each(data, function () {
-                if (projectManagerId === this.Id) {
-                    $('#projectManagers').append('<option selected value=' +
-                        this.Id + '>' + this.Name + '</option>');
-                } else if (projectManagerId !== this.Id) {
-                $('#projectManagers').append('<option value=' +
-                    this.Id + '>' + this.Name + '</option>');
+                if (projectId === this.ProjectId) {
+                    $('#projects').append('<option selected  value=' +
+                        this.ProjectId + '>' + this.Name + '</option>');
+                } else if (projectManagerId !== this.ProjectId) {
+                    $('#projects').append('<option value=' +
+                        this.ProjectId + '>' + this.Name + '</option>');
                 }
-            });
-            $.getJSON('/Assignment/GetProjects', { projectManagerId: $('#projectManagers').val() }, function (data) {
-                $.each(data, function () {
-                    if (projectId === this.ProjectId) {
-                        $('#projects').append('<option selected  value=' +
-                            this.ProjectId + '>' + this.Name + '</option>');
-                    } else if (projectManagerId !== this.ProjectId) {
-                        $('#projects').append('<option value=' +
-                            this.ProjectId + '>' + this.Name + '</option>');
-                    }
 
+            });
+
+
+            $.getJSON('/Assignment/GetProjectManager', { projectId: $('#projects').val() }, function (data) {
+                $.each(data, function () {
+                    if (projectManagerId === this.Id) {
+                        $('#projectManagers').append('<option selected value=' +
+                            this.Id + '>' + this.Name + '</option>');
+                    } else if (projectManagerId !== this.Id) {
+                        $('#projectManagers').append('<option value=' +
+                            this.Id + '>' + this.Name + '</option>');
+                    }
                 });
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 //alert('Error getting client sectors!');
@@ -169,18 +169,20 @@
             alert('Error getting projects!');
         });
 
-        $('#projectManagers').change(function () {
-            $('#projects option').remove();
-            $.getJSON('/Assignment/GetProjects', { projectManagerId: $('#projectManagers').val() }, function (data) {
+
+        $('#projects').change(function () {
+            $('#projectManagers option').remove();
+            $.getJSON('/Assignment/GetProjectManager', { projectId: $('#projects').val() }, function (data) {
                 $.each(data, function () {
-                    $('#projects').append('<option value=' +
-                        this.ProjectId + '>' + this.Name + '</option>');
+                    $('#projectManagers').append('<option value=' +
+                        this.Id + '>' + this.Name + '</option>');
                 });
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 alert('Error getting project managers!');
             });
         });
     });
+
 
 </script>
 

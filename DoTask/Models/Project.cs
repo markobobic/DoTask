@@ -15,16 +15,16 @@ namespace DoTask.Models
         public int Id { get; set; }
         [StringLength(maximumLength: 50, MinimumLength = 1, ErrorMessage = "Name must be between 1 and 50 characters!")]
         [Required(ErrorMessage = "You must provide name of project")]
+        [Index]
         public string Name { get; set; }
         [Required(ErrorMessage = "You must provide project code")]
         [Remote("DoesCodeExist", "Projects", ErrorMessage = "Code already exists")]
         [StringLength(maximumLength: 50, MinimumLength = 1, ErrorMessage = "Code must be between 1 and 50 characters!")]
         public string Code { get; set; }
-        public ICollection<Assignment> Tasks { get; set; } = new List<Assignment>();
-        [Required]
+        public virtual ICollection<Assignment> Tasks { get; set; } 
         public string ProjectManagerId { get; set; }
-        
-        public ApplicationUser ProjectManager { get; set; }
+
+        public ApplicationUser ProjectManager { get; set; } 
 
 
     }

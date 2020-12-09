@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DoTask.Repository
 {
-    public  class GenericRepo<T> : IGenericRepo<T> where T : class
+    public  class GenericRepo<T> :IDisposable, IGenericRepo<T> where T : class
     {
         protected ApplicationDbContext RepositoryContext { get; set; }
 
@@ -60,7 +60,7 @@ namespace DoTask.Repository
                 RepositoryContext.Entry(entity).State = EntityState.Modified;
             }
             catch (Exception e)
-            {
+                {
 
                 throw e;
             }
@@ -85,6 +85,22 @@ namespace DoTask.Repository
         {
             await RepositoryContext.SaveChangesAsync();
         }
+        protected void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (RepositoryContext != null)
+                {
+                    RepositoryContext.Dispose();
+                }
+            }
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
     }
 }
 

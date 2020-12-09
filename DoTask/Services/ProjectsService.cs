@@ -1,7 +1,10 @@
-﻿using DoTask.Models;
+﻿using DoTask.Helpers;
+using DoTask.Models;
 using DoTask.Repository;
 using DoTask.VievModels;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -9,6 +12,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace DoTask.Services
@@ -85,21 +89,31 @@ namespace DoTask.Services
             Update(project);
         }
 
-        public async Task<SelectList> IncludeRoles()
+        public async Task<SortedSet<SelectListItem>> IncludeProjectManagersDropdown([Optional] ApplicationUser projectM)
         {
-            var data = await (from user in db.Users
-                              from userRole in user.Roles
-                              join role in db.Roles on userRole.RoleId equals role.Id
-                              where role.Name == "ProjectManager"
-                              select new
-                              {
-                                  ProjectManagerId = user.Id,
-                                  FullName = user.FirstName + " " + user.LastName
-                              }).ToListAsync();
+            if (projectM != null)
+            {
+                SelectListItem currentProjectM = new SelectListItem() { Value = projectM.Id, Text = projectM.FullName, Selected = true };
+                if (projectM != null)
+                {
+                    var projectManagersToUpdate = await Dropdown.GenereteDropDownUsers(db,RoleName.ProjectManager);
+                    projectManagersToUpdate.Remove(projectManagersToUpdate.Single(x => x.Value == projectM.Id));
+                    projectManagersToUpdate.Add(currentProjectM);
+                    SelectListItem noneForUpdate = new SelectListItem() { Value = "None", Text = "None", Selected = false };
+                    projectManagersToUpdate.Add(noneForUpdate);
+                    return projectManagersToUpdate;
 
-
-            return new SelectList(data, "ProjectManagerId", "FullName");
+                }
+                var projectManagers = await Dropdown.GenereteDropDownUsers(db, RoleName.ProjectManager);
+                return projectManagers;
+            }
+            var projectManagersIfNone =  await Dropdown.GenereteDropDownUsers(db, RoleName.ProjectManager);
+            SelectListItem none = Dropdown.CreateNoneForDropdown();
+            projectManagersIfNone.Add(none);
+            return projectManagersIfNone;
         }
+
+        
 
         public async Task<Project> MapData(ProjectViewModel viewModel)
         {
@@ -113,31 +127,80 @@ namespace DoTask.Services
             }
             return null;
         }
-        public async Task<Project> UpdateMapData(ProjectUpdateViewModel updateViewModel)
+        public async Task<Project> UpdateMapData(ProjectUpdateViewModel updateViewModel,bool isNone)
         {
             var project =await db.Projects.Where(x => x.Id == updateViewModel.Id)
                 .Include(x => x.ProjectManager).SingleOrDefaultAsync();
             var projectManager = await db.Users.Where(x => x.Id == updateViewModel.ProjectManagerId).FirstOrDefaultAsync();
+            if(isNone ==true && projectManager != null)
+            {
+                var assignments = await db.Assignments.Where(x => x.ProjectId == project.Id && x.AssingToNone == true && x.Project.ProjectManager==null).ToListAsync();
+                foreach(var assignment in assignments)
+                {
+                    assignment.AssingToNone = false;
+                    db.Entry(assignment).Property(x => x.AssingToNone).IsModified = true;
+                }
+               await db.SaveChangesAsync();
+            } else if(isNone == false && projectManager == null)
+            {
+                var assigmentsDevs = await db.Users.SelectMany(x => x.Assignments).Where(x => x.ProjectId == project.Id).ToListAsync();
 
+                var noneAssigmentsForDev = await db.Assignments.Where(x => x.ProjectId == project.Id && x.ProjectId != null && x.AssingToNone == true).ToListAsync();
+                if(assigmentsDevs.Count>0 && noneAssigmentsForDev.Count > 0)
+                {
+                    db.Assignments.RemoveRange(assigmentsDevs);
+                    db.Assignments.RemoveRange(noneAssigmentsForDev);
+                    await db.SaveChangesAsync();
+                } else if(assigmentsDevs.Count>0 && noneAssigmentsForDev.Count == 0)
+                {
+                    db.Assignments.RemoveRange(assigmentsDevs);
+                    await db.SaveChangesAsync();
+                } else if(noneAssigmentsForDev.Count>0 && assigmentsDevs.Count == 0)
+                {
+                    db.Assignments.RemoveRange(noneAssigmentsForDev);
+                    await db.SaveChangesAsync();
+                }
+            }
             project.Name = updateViewModel.Name;
             project.ProjectManager = projectManager;
             project.Code = updateViewModel.Code;
             return project;
         }
-        protected void Dispose(bool disposing)
+
+        public async Task<ApplicationUser> GetCurrentUser()
         {
-            if (disposing)
-            {
-                if (db != null)
-                {
-                    db.Dispose();
-                }
-            }
+          return await  System.Web.HttpContext.Current.GetOwinContext().
+             GetUserManager<ApplicationUserManager>().FindByIdAsync(System.Web.HttpContext.Current.User.Identity.GetUserId());
         }
-        public void Dispose()
+
+
+        public async Task<IEnumerable<ProjectIndexViewModel>> GetProjectDataAdminAsync()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            var getAll = await GetAllProjectssWithProjectManager();
+            var data =  getAll.Select(x => new ProjectIndexViewModel
+            {
+                Id = x.Id,
+                Code = x.Code,
+                Name = x.Name,
+                ProjectManager = x.ProjectManagerId == null ? "Unassigned" : $"{x.ProjectManager.FirstName} {x.ProjectManager.LastName}"
+            });
+            return data;
+        }
+
+        public async Task<IEnumerable<ProjectIndexProjectManagerViewModel>> GetProjectDataProjectManagerAsync()
+        {
+            var getAll = await GetAllProjectssWithProjectManager();
+            var data = getAll.Select(x => new ProjectIndexProjectManagerViewModel
+            {
+                Id = x.Id,
+                Code = x.Code,
+                Name = x.Name,
+                ProjectManager = x.ProjectManagerId == null ?
+                "Unassigned" : $"{x.ProjectManager.FirstName} {x.ProjectManager.LastName}",
+                AverageProgress = x.Tasks.Sum(y=>y.Progress) /2
+                
+            });
+            return data;
         }
     }
 }

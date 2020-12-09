@@ -26,10 +26,12 @@ namespace DoTask.Models
         public string Decription { get; set; }
         public bool AssingToNone { get; set; }
         public Status Status { get; set; }
+        [Index]
         public int StatusId { get; set; }
+        [Index]
         public int? ProjectId { get; set; }
-        [ForeignKey("ProjectId")]
-        public Project Project { get; set; }
+        
+        public virtual Project Project { get; set; }
        
         public ICollection<ApplicationUser> Developers { get; set; } = new List<ApplicationUser>();
         

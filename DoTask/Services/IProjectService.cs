@@ -17,12 +17,15 @@ namespace DoTask.Services
         Task<Project> GetUserWithDetailsAsync(int projectId);
         Task<IEnumerable<Project>> GetAllProjectssWithTasks();
         Task<IEnumerable<Project>> GetAllProjectssWithProjectManager();
-        Task<SelectList> IncludeRoles();
+        Task<SortedSet<SelectListItem>> IncludeProjectManagersDropdown([Optional] ApplicationUser projectM);
         Task SaveChangesAsync();
         void CreateProject(Project project);
         void UpdateProject(Project project);
         void DeleteProject(Project project);
         Task<Project> MapData(ProjectViewModel viewModel);
-        Task<Project> UpdateMapData(ProjectUpdateViewModel updateViewModel);
+        Task<Project> UpdateMapData(ProjectUpdateViewModel updateViewModel,bool isNone);
+        Task<ApplicationUser> GetCurrentUser();
+        Task<IEnumerable<ProjectIndexProjectManagerViewModel>> GetProjectDataProjectManagerAsync();
+        Task<IEnumerable<ProjectIndexViewModel>> GetProjectDataAdminAsync();
     }
 }

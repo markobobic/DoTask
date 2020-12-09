@@ -1,5 +1,9 @@
-﻿using DoTask.Services;
+﻿using DoTask.Helpers;
+using DoTask.Models;
+using DoTask.Services;
 using DoTask.VievModels;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +32,17 @@ namespace DoTask.Controllers
         [HttpGet]
         public async Task<ActionResult> Add()
         {
-            ViewBag.ProjectManagers = await db.IncludeRoles();
+            if (User.IsInRole(RoleName.Admin)) { 
+            ViewBag.ProjectManagers = await db.IncludeProjectManagersDropdown();
+                return View();
+            }
+            ApplicationUser currentProjectManager = System.Web.HttpContext.Current.GetOwinContext().
+            GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
+            ViewBag.ProjectManagerName = currentProjectManager.FullName;
+            ViewBag.ProjectManagerId = currentProjectManager.Id;
             return View();
+            
+           
         }
 
         [HttpPost]
@@ -43,21 +56,14 @@ namespace DoTask.Controllers
                 await db.SaveChangesAsync();
                 return Json(new { success = true, message = "Added Successfully" });
             }
-            ViewBag.ProjectManagers = db.IncludeRoles();
+            ViewBag.ProjectManagers = db.IncludeProjectManagersDropdown();
             return Index();
         }
         [HttpGet]
         public async Task<ActionResult> GetData()
         {
-            var getAll = await db.GetAllProjectssWithProjectManager();
-            var data = getAll.Select(x => new
-            {
-                Id=x.Id,
-                Code = x.Code,
-                Name = x.Name,
-                ProjectManager = $"{x.ProjectManager.FirstName} {x.ProjectManager.LastName}"
-            });
-            return Json(data, JsonRequestBehavior.AllowGet);
+                var dataForPM = await db.GetProjectDataProjectManagerAsync();
+                return Json(dataForPM, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -71,9 +77,10 @@ namespace DoTask.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.NotFound);
 
                 }
+                AssignToNone.IsNone = project.ProjectManagerId == null ? true : false;
                 ProjectUpdateViewModel viewModel = new ProjectUpdateViewModel(project.Code,project.Name,
                  project.ProjectManagerId, id);
-                ViewBag.ProjectManagers = await db.IncludeRoles();
+                ViewBag.ProjectManagers = await db.IncludeProjectManagersDropdown(project.ProjectManager);
                 return View(viewModel);
             }
             return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -85,12 +92,12 @@ namespace DoTask.Controllers
         {
             if (ModelState.IsValid)
             {
-                var project = await db.UpdateMapData(viewModel);
+                var project = await db.UpdateMapData(viewModel,AssignToNone.IsNone);
                 db.UpdateProject(project);
                 await db.SaveChangesAsync();
                 return Json(new { success = true, message = "Updated Successfully" }, JsonRequestBehavior.AllowGet);
             }
-            ViewBag.ProjectManagers = await db.IncludeRoles();
+            ViewBag.ProjectManagers = await db.IncludeProjectManagersDropdown();
             return new HttpStatusCodeResult(HttpStatusCode.NotModified);
         }
 

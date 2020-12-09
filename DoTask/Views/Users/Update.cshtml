@@ -31,11 +31,11 @@
     
 
     <div class="container-fluid">
-        <br />
+        <br /><br /><br />
         <div class="imageWrapper" style="position: relative;">
-            @if (Model.Photo == null)
+            @if (Model.Photo.Length ==0)
             {
-                <img id="picture" class="avatar img-circle img-thumbnail" src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" style="max-height:50px; margin-left:45px; max-width:100px;" alt="">
+            <img id="picture" src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-responsive img-thumbnail" style="max-height:100px;max-width:100px;" alt="avatar">
             }
             else
             {

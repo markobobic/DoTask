@@ -81,6 +81,19 @@ namespace DoTask.Controllers
                     var user = UserManager.FindByName(model.UserName);
                     user.LastActivity = DateTimeOffset.Now;
                     var status = UserManager.Update(user);
+                    if (User.IsInRole("Admin"))
+                    {
+                        return RedirectToAction("Index", "Users");
+                    }
+                     if(User.IsInRole("ProjectManager"))
+                    {
+                        return RedirectToAction("ProjectsTaskDevelopers", "Assignment");
+                    }
+                     if (User.IsInRole("Developer"))
+                    {
+                        return RedirectToAction("DeveloperTasks","Assignment");
+                    }
+                   
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
